@@ -1,0 +1,7 @@
+.idea
+*.exe
+imaptool.exe
+install.lock
+logs/
+data/
+config/mysql.json

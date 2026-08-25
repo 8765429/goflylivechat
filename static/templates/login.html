@@ -1,0 +1,227 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>GoflyLiveChat - Open Source Live Chat</title>
+    <link rel="stylesheet" href="/static/cdn/element-ui/2.15.1/theme-chalk/index.min.css">
+    <script src="/static/cdn/vue/2.6.11/vue.min.js"></script>
+    <script src="/static/cdn/element-ui/2.15.1/index.js"></script>
+    <script src="/static/cdn/jquery/3.6.0/jquery.min.js"></script>
+    <script src="/static/js/chat-lang.js?v=langv1"></script>
+    <script src="/static/js/functions.js?v=fgffdwersdccvcbv"></script>
+
+    <style>
+        body {
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .signin {
+            width: 350px;
+            padding: 20px;
+            background: #fff;
+            -webkit-box-shadow: 0 1px 2px 0 rgba(101,129,156,.08);
+            box-shadow: 0 1px 2px 0 rgba(101,129,156,.08);
+            border-radius: 4px;
+        }
+        .signin h1, .signin h2, .signin .copyright {
+            font-weight: normal;
+            color: #4d627b;
+            text-align: center;
+        }
+        .signin .loginTitle {
+            font-size: 22px;
+            margin: 20px 0px;
+        }
+        .signin .copyright {
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            .signin {
+                width: 90%;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+<div id="app" class="signin">
+    <template>
+        <div class="loginHtml">
+            <h1 class="loginTitle"><{lang.loginTitle}></h1>
+            <el-form :model="form" :rules="rules" ref="loginForm" v-show="!showRegHtml">
+                <el-form-item prop="account">
+                    <el-input v-model="form.account" :placeholder="lang.enterUsername"></el-input>
+                </el-form-item>
+                <el-form-item prop="password">
+                    <el-input show-password v-on:keyup.enter.native="handleLogin('loginForm')" v-model="form.password" :placeholder="lang.enterPassword"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button style="width: 100%" type="primary" @click="handleLogin('loginForm')"><{lang.login}></el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button style="width: 100%" @click="showRegHtml=true"><{lang.createAccount}></el-button>
+                </el-form-item>
+            </el-form>
+
+            <el-form :model="form" :rules="rules" ref="registerForm" v-show="showRegHtml">
+                <el-form-item prop="account">
+                    <el-input v-model="form.account" :placeholder="lang.chooseUsername"></el-input>
+                </el-form-item>
+                <el-form-item prop="nickname">
+                    <el-input v-model="form.nickname" :placeholder="lang.createDisplayName"></el-input>
+                </el-form-item>
+                <el-form-item prop="password">
+                    <el-input show-password v-model="form.password" :placeholder="lang.createPassword"></el-input>
+                </el-form-item>
+                <el-form-item prop="rePassword">
+                    <el-input show-password v-on:keyup.enter.native="handleRegister('registerForm')" v-model="form.rePassword" :placeholder="lang.confirmPassword"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button style="width: 100%" type="primary" @click="handleRegister('registerForm')"><{lang.signUp}></el-button>
+                </el-form-item>
+                <el-form-item>
+                    <el-button style="width: 100%" @click="showRegHtml=false"><{lang.backToLogin}></el-button>
+                </el-form-item>
+            </el-form>
+        </div>
+
+        <p class="copyright">GOFLY LIVE CHAT - Open Source Live Chat Platform</p>
+    </template>
+</div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        delimiters: ["<{", "}>"],
+        data: {
+            lang:getLangObj(),
+            form: {
+                account: "",
+                password: "",
+                rePassword: "",
+                nickname:"",
+            },
+            rules: {
+                account: [
+                    { required: true, message: t("usernameRequired"), trigger: 'blur' },
+                    { min: 2, max: 20, message: t("usernameLength"), trigger: 'blur' }
+                ],
+                nickname: [
+                    { required: true, message: t("displayNameRequired"), trigger: 'blur' },
+                    { min: 1, max: 60, message: t("displayNameLength"), trigger: 'blur' }
+                ],
+                password: [
+                    { required: true, message: t("passwordRequired"), trigger: 'blur' },
+                    { min: 2, message: t("passwordLength"), trigger: 'blur' }
+                ],
+                rePassword: [
+                    { required: true, message: t("confirmPasswordRequired"), trigger: 'blur' },
+                    { validator: this.validatePasswordMatch, trigger: 'blur' }
+                ]
+            },
+            showRegHtml: false,
+        },
+        methods: {
+            validatePasswordMatch(rule, value, callback) {
+                if (value !== this.form.password) {
+                    callback(new Error(t("passwordMismatch")));
+                } else {
+                    callback();
+                }
+            },
+
+            handleLogin(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.login();
+                    }
+                });
+            },
+
+            handleRegister(formName) {
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.register();
+                    }
+                });
+            },
+
+            login() {
+                let data = {
+                    "username": this.form.account,
+                    "password": this.form.password,
+                };
+
+                $.post("/check", data, (response) => {
+                    if (response.code === 200) {
+                        this.$message({
+                            message: t("welcomeBack"),
+                            type: 'success'
+                        });
+                        localStorage.setItem("token", response.result.token);
+                        window.location.href = "/main";
+                    } else {
+                        this.$message({
+                            message: response.message || t("invalidCredentials"),
+                            type: 'error'
+                        });
+                    }
+                }).fail(() => {
+                    this.$message({
+                        message: t("connectionError"),
+                        type: 'error'
+                    });
+                });
+            },
+
+            register() {
+                if (this.form.password !== this.form.rePassword) {
+                    this.$message({
+                        message: t("passwordMismatch"),
+                        type: 'error'
+                    });
+                    return;
+                }
+
+                let data = {
+                    "username": this.form.account,
+                    "password": this.form.password,
+                    "nickname": this.form.nickname,
+                };
+
+                $.post("/register", data, (response) => {
+                    if (response.code === 200) {
+                        this.$message({
+                            message: t("accountCreated"),
+                            type: 'success'
+                        });
+                        this.showRegHtml = false;
+                    } else {
+                        this.$message({
+                            message: response.msg || t("registrationFailed"),
+                            type: 'error'
+                        });
+                    }
+                }).fail(() => {
+                    this.$message({
+                        message: t("connectionError"),
+                        type: 'error'
+                    });
+                });
+            }
+        },
+        created: function() {
+            if (top.location != location) {
+                top.location.href = location.href;
+            }
+        }
+    });
+</script>
+</html>
