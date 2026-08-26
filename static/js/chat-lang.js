@@ -107,6 +107,7 @@ var GOFLY_LANG={
         "emailSmtp":"邮箱地址(SMTP)",
         "emailAccount":"邮箱账号",
         "emailPassword":"邮箱密码(SMTP)",
+        "emailTo":"接收通知邮箱",
         "uploadAvatarLimit":"上传头像图片大小不能超过 1MB!",
         "successMsg":"保存成功",
 
@@ -238,6 +239,7 @@ var GOFLY_LANG={
         "emailSmtp":"Email Address (SMTP)",
         "emailAccount":"Email Account",
         "emailPassword":"Email Password (SMTP)",
+        "emailTo":"Notification Email To",
         "uploadAvatarLimit":"Avatar image size cannot exceed 1MB!",
         "successMsg":"Saved successfully",
 

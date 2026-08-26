@@ -48,7 +48,11 @@ func SendNoticeEmail(username, msg string) {
 	if smtp == "" || email == "" || password == "" {
 		return
 	}
-	err := tools.SendSmtp(smtp, email, password, []string{email}, "[通知]"+username, msg)
+	to := models.FindConfig("NoticeEmailTo")
+	if to == "" {
+		to = email
+	}
+	err := tools.SendSmtp(smtp, email, password, []string{to}, "[通知]"+username, msg)
 	if err != nil {
 		log.Println(err)
 	}

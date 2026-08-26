@@ -87,6 +87,8 @@ INSERT INTO `config` (`id`, `conf_name`, `conf_key`, `conf_value`, `user_id`) VA
 (NULL, 'Email Account', 'NoticeEmailAddress', '','agent');
 INSERT INTO `config` (`id`, `conf_name`, `conf_key`, `conf_value`, `user_id`) VALUES
 (NULL, 'Email Password (SMTP)', 'NoticeEmailPassword', '','agent');
+INSERT INTO `config` (`id`, `conf_name`, `conf_key`, `conf_value`, `user_id`) VALUES
+(NULL, 'Email To', 'NoticeEmailTo', '','agent');
 
 
 DROP TABLE IF EXISTS `reply_group`;

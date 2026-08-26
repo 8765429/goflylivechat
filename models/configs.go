@@ -44,7 +44,9 @@ func FindConfig(key string) string {
 			return config.ConfValue
 		}
 	}
-	return ""
+	var config Config
+	DB.Where("conf_key = ?", key).First(&config)
+	return config.ConfValue
 }
 func FindConfigByUserId(userId interface{}, key string) Config {
 	var config Config
