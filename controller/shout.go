@@ -46,15 +46,19 @@ func SendNoticeEmail(username, msg string) {
 	email := models.FindConfig("NoticeEmailAddress")
 	password := models.FindConfig("NoticeEmailPassword")
 	if smtp == "" || email == "" || password == "" {
+		log.Println("SendNoticeEmail: SMTP config missing, skip sending")
 		return
 	}
 	to := models.FindConfig("NoticeEmailTo")
 	if to == "" {
 		to = email
 	}
+	log.Println("SendNoticeEmail: sending from", email, "to", to, "via", smtp)
 	err := tools.SendSmtp(smtp, email, password, []string{to}, "[通知]"+username, msg)
 	if err != nil {
-		log.Println(err)
+		log.Println("SendNoticeEmail error:", err)
+	} else {
+		log.Println("SendNoticeEmail: sent successfully to", to)
 	}
 }
 func SendAppGetuiPush(kefu string, title, content string) {
