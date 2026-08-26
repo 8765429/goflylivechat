@@ -4,4 +4,6 @@ imaptool.exe
 install.lock
 logs/
 data/
+.env
 config/mysql.json
+config/mysql-docker.json
