@@ -58,7 +58,7 @@ func FindUser(username string) User {
 }
 func FindUserById(id interface{}) User {
 	var user User
-	DB.Select("user.*,role.name role_name,role.id role_id").Joins("join user_role on user.id=user_role.user_id").Joins("join role on user_role.role_id=role.id").Where("user.id = ?", id).First(&user)
+	DB.Where("id = ?", id).First(&user)
 	return user
 }
 func DeleteUserById(id string) {
@@ -66,11 +66,11 @@ func DeleteUserById(id string) {
 }
 func FindUsers() []User {
 	var users []User
-	DB.Select("user.*,role.name role_name").Joins("left join user_role on user.id=user_role.user_id").Joins("left join role on user_role.role_id=role.id").Order("user.id desc").Find(&users)
+	DB.Order("id desc").Find(&users)
 	return users
 }
 func FindUserRole(query interface{}, id interface{}) User {
 	var user User
-	DB.Select(query).Where("user.id = ?", id).Joins("join user_role on user.id=user_role.user_id").Joins("join role on user_role.role_id=role.id").First(&user)
+	DB.Where("id = ?", id).First(&user)
 	return user
 }

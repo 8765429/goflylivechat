@@ -55,7 +55,7 @@
     <template>
         <div class="loginHtml">
             <h1 class="loginTitle"><{lang.loginTitle}></h1>
-            <el-form :model="form" :rules="rules" ref="loginForm" v-show="!showRegHtml">
+            <el-form :model="form" :rules="rules" ref="loginForm">
                 <el-form-item prop="account">
                     <el-input v-model="form.account" :placeholder="lang.enterUsername"></el-input>
                 </el-form-item>
