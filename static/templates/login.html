@@ -65,30 +65,6 @@
                 <el-form-item>
                     <el-button style="width: 100%" type="primary" @click="handleLogin('loginForm')"><{lang.login}></el-button>
                 </el-form-item>
-                <el-form-item>
-                    <el-button style="width: 100%" @click="showRegHtml=true"><{lang.createAccount}></el-button>
-                </el-form-item>
-            </el-form>
-
-            <el-form :model="form" :rules="rules" ref="registerForm" v-show="showRegHtml">
-                <el-form-item prop="account">
-                    <el-input v-model="form.account" :placeholder="lang.chooseUsername"></el-input>
-                </el-form-item>
-                <el-form-item prop="nickname">
-                    <el-input v-model="form.nickname" :placeholder="lang.createDisplayName"></el-input>
-                </el-form-item>
-                <el-form-item prop="password">
-                    <el-input show-password v-model="form.password" :placeholder="lang.createPassword"></el-input>
-                </el-form-item>
-                <el-form-item prop="rePassword">
-                    <el-input show-password v-on:keyup.enter.native="handleRegister('registerForm')" v-model="form.rePassword" :placeholder="lang.confirmPassword"></el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button style="width: 100%" type="primary" @click="handleRegister('registerForm')"><{lang.signUp}></el-button>
-                </el-form-item>
-                <el-form-item>
-                    <el-button style="width: 100%" @click="showRegHtml=false"><{lang.backToLogin}></el-button>
-                </el-form-item>
             </el-form>
         </div>
 
@@ -105,50 +81,23 @@
             form: {
                 account: "",
                 password: "",
-                rePassword: "",
-                nickname:"",
             },
             rules: {
                 account: [
                     { required: true, message: t("usernameRequired"), trigger: 'blur' },
                     { min: 2, max: 20, message: t("usernameLength"), trigger: 'blur' }
                 ],
-                nickname: [
-                    { required: true, message: t("displayNameRequired"), trigger: 'blur' },
-                    { min: 1, max: 60, message: t("displayNameLength"), trigger: 'blur' }
-                ],
                 password: [
                     { required: true, message: t("passwordRequired"), trigger: 'blur' },
                     { min: 2, message: t("passwordLength"), trigger: 'blur' }
                 ],
-                rePassword: [
-                    { required: true, message: t("confirmPasswordRequired"), trigger: 'blur' },
-                    { validator: this.validatePasswordMatch, trigger: 'blur' }
-                ]
             },
-            showRegHtml: false,
         },
         methods: {
-            validatePasswordMatch(rule, value, callback) {
-                if (value !== this.form.password) {
-                    callback(new Error(t("passwordMismatch")));
-                } else {
-                    callback();
-                }
-            },
-
             handleLogin(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
                         this.login();
-                    }
-                });
-            },
-
-            handleRegister(formName) {
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.register();
                     }
                 });
             },
@@ -170,42 +119,6 @@
                     } else {
                         this.$message({
                             message: response.message || t("invalidCredentials"),
-                            type: 'error'
-                        });
-                    }
-                }).fail(() => {
-                    this.$message({
-                        message: t("connectionError"),
-                        type: 'error'
-                    });
-                });
-            },
-
-            register() {
-                if (this.form.password !== this.form.rePassword) {
-                    this.$message({
-                        message: t("passwordMismatch"),
-                        type: 'error'
-                    });
-                    return;
-                }
-
-                let data = {
-                    "username": this.form.account,
-                    "password": this.form.password,
-                    "nickname": this.form.nickname,
-                };
-
-                $.post("/register", data, (response) => {
-                    if (response.code === 200) {
-                        this.$message({
-                            message: t("accountCreated"),
-                            type: 'success'
-                        });
-                        this.showRegHtml = false;
-                    } else {
-                        this.$message({
-                            message: response.msg || t("registrationFailed"),
                             type: 'error'
                         });
                     }

@@ -30,6 +30,13 @@
 
             avatarUrl:"",
             chatEndpoint: "",
+            kefuList:[],
+            showCreateUser:false,
+            newUser:{
+                name:"",
+                nickname:"",
+                password:"",
+            },
             configList:[
                     {
                         "conf_name": t("announcement"),
@@ -230,6 +237,52 @@
             openChatWindow(url) {
                 // 在新窗口打开聊天页面
                 window.open(url, '_blank');
+            },
+            getKefuList(){
+                let _this=this;
+                this.sendAjax("/kefulist","get",{},function(result){
+                    _this.kefuList=result;
+                });
+            },
+            createUser(){
+                let _this=this;
+                if(!this.newUser.name||!this.newUser.password){
+                    this.$message({message:t("usernameRequired"),type:'error'});
+                    return;
+                }
+                $.ajax({
+                    type:"POST",
+                    url:"/register",
+                    data:{
+                        username:_this.newUser.name,
+                        password:_this.newUser.password,
+                        nickname:_this.newUser.nickname,
+                    },
+                    headers:{"token":localStorage.getItem("token")},
+                    success:function(data){
+                        if(data.code==200){
+                            _this.$message({message:t("accountCreated"),type:'success'});
+                            _this.showCreateUser=false;
+                            _this.newUser={name:"",nickname:"",password:""};
+                            _this.getKefuList();
+                        }else{
+                            _this.$message({message:data.msg||t("registrationFailed"),type:'error'});
+                        }
+                    }
+                });
+            },
+            deleteUser(id){
+                let _this=this;
+                this.$confirm(t("confirmDeletion"),t("delete"),{
+                    confirmButtonText:t("confirm"),
+                    cancelButtonText:t("cancel"),
+                    type:'warning'
+                }).then(()=>{
+                    _this.sendAjax("/kefuinfo?id="+id,"DELETE",{},function(){
+                        _this.$message({message:t("successMsg"),type:'success'});
+                        _this.getKefuList();
+                    });
+                }).catch(()=>{});
             }
         },
 
@@ -241,6 +294,7 @@
 
             this.getKefuInfo();
             this.initInfo();
+            this.getKefuList();
 
         },
         created: function () {
